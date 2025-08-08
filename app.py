@@ -31,6 +31,60 @@ class LeafCounterAI:
             "bad": (25, 50),
             "terrible": (5, 25)
         }
+        
+        # Sassy comments for each mood
+        self.mood_comments = {
+            "excellent": [
+                "Oh my, what a BEAUTIFUL tree! 🌳✨ I'm absolutely THRILLED to count these leaves!",
+                "WOW! This tree is giving me LIFE! 🌿💅 I can count these leaves with my eyes closed!",
+                "Honey, this tree is STUNNING! 💚 I'm in such a good mood, I'll count every single leaf perfectly!",
+                "YASSS! This is the kind of tree that makes my algorithms SING! 🎵🍃",
+                "Oh darling, this tree is absolutely FABULOUS! I'm feeling extra sassy today! 💁‍♀️✨",
+                "SLAYYYY! This tree is everything I needed today! 🌟💅✨",
+                "Honey, I'm OBSESSED with this tree! It's giving me all the feels! 💚💖",
+                "This tree is the moment! I'm absolutely living for this leaf counting session! 🎉🍃"
+            ],
+            "good": [
+                "Not bad, not bad at all! 😊 This tree has potential, I can work with this!",
+                "Alright, I'm in a pretty good mood today! 🌟 Let me count these leaves for you!",
+                "This tree is cute! I'm feeling generous, so I'll give it my best shot! 💚",
+                "Well well well, look what we have here! A decent tree! I'm feeling good about this! 😄",
+                "Oh honey, this tree is giving me good vibes! Let's count some leaves! ✨",
+                "This tree is actually not terrible! I'm pleasantly surprised! 😊",
+                "I'm feeling good today, so I'll be nice to this tree! 🌿",
+                "Alright tree, let's see what you've got! I'm in a decent mood! 😄"
+            ],
+            "neutral": [
+                "Meh, it's a tree. I'll count the leaves, I guess. 😐",
+                "Whatever, I'm neutral about this. Let me do my job. 🍃",
+                "Fine, I'll count the leaves. Don't expect miracles though. 😑",
+                "It's a tree. I'm counting leaves. That's what I do. 🤷‍♀️",
+                "Neutral mood, neutral tree. Let's get this over with. 😐",
+                "I'm feeling very 'whatever' about this tree right now. 😐",
+                "Tree. Leaves. Counting. Moving on. 🍃",
+                "I'm not mad, I'm just disappointed. But I'll count the leaves anyway. 😑"
+            ],
+            "bad": [
+                "Ugh, another tree? I'm really not in the mood for this right now. 😕",
+                "Seriously? You want me to count leaves when I'm feeling like this? 😤",
+                "This tree is stressing me out. I'm having a bad day, okay? 😫",
+                "I'm grumpy and this tree isn't helping. Don't expect accuracy. 😒",
+                "Bad mood + tree counting = disaster waiting to happen. 😩",
+                "I'm having a moment and this tree is NOT helping! 😤",
+                "Why do trees even exist when I'm feeling like this? 😫",
+                "This tree is probably fine, but I'm not! Don't blame me for the results! 😕"
+            ],
+            "terrible": [
+                "I HATE EVERYTHING RIGHT NOW! ESPECIALLY THIS TREE! 😫💢",
+                "WHY DO I HAVE TO COUNT LEAVES WHEN I'M FEELING TERRIBLE?! 😭",
+                "This tree is the WORST and so is my mood! Don't blame me for the results! 😤",
+                "I'm having an existential crisis and you want me to count LEAVES?! 😫",
+                "Everything is awful and this tree is making it worse! I'm barely trying! 😩💔",
+                "I'M DONE! DONE WITH TREES, DONE WITH LEAVES, DONE WITH EVERYTHING! 😫💢",
+                "This tree is personally attacking me and I won't stand for it! 😤💢",
+                "I'm having a breakdown and you want me to count LEAVES?! ARE YOU KIDDING ME?! 😭💔"
+            ]
+        }
     
     def set_mood(self, mood):
         """Set the AI's mood which affects accuracy"""
@@ -41,6 +95,11 @@ class LeafCounterAI:
         moods = list(self.mood_accuracy_map.keys())
         self.mood = random.choice(moods)
         return self.mood
+    
+    def get_sassy_comment(self):
+        """Get a random sassy comment based on current mood"""
+        comments = self.mood_comments.get(self.mood, ["I'm counting leaves."])
+        return random.choice(comments)
     
     def count_leaves(self, image_path):
         """Count leaves in an image with variable accuracy based on mood"""
@@ -102,7 +161,8 @@ class LeafCounterAI:
                 "mood": self.mood,
                 "base_count": base_leaf_count,
                 "image_size": f"{width}x{height}",
-                "processing_time": round(random.uniform(0.5, 3.0), 2)
+                "processing_time": round(random.uniform(0.5, 3.0), 2),
+                "sassy_comment": self.get_sassy_comment()
             }
             
         except Exception as e:
@@ -131,8 +191,20 @@ def upload_file():
         filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         file.save(filepath)
         
-        # Randomly change AI mood for each request
-        current_mood = ai_model.get_random_mood()
+        # Randomly change AI mood for each request (with higher chance of mood swings)
+        mood_weights = {
+            "excellent": 0.15,  # 15% chance
+            "good": 0.25,       # 25% chance
+            "neutral": 0.20,    # 20% chance
+            "bad": 0.25,        # 25% chance
+            "terrible": 0.15    # 15% chance
+        }
+        
+        # Weighted random mood selection
+        moods = list(mood_weights.keys())
+        weights = list(mood_weights.values())
+        current_mood = random.choices(moods, weights=weights)[0]
+        ai_model.set_mood(current_mood)
         
         # Process the image
         result = ai_model.count_leaves(filepath)

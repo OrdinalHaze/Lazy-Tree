@@ -114,6 +114,29 @@
             padding: 20px;
             margin-bottom: 20px;
         }
+        
+        .current-mood-display {
+            background: white;
+            border: 2px solid #556B2F;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        
+        .current-mood-display h4 {
+            color: #556B2F;
+            margin-bottom: 10px;
+        }
+        
+        .mood-info {
+            background: #E8F5E8;
+            border: 1px solid #90EE90;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 15px;
+            text-align: center;
+        }
 
         .mood-buttons {
             display: flex;
@@ -163,6 +186,18 @@
             padding: 15px;
             margin: 10px 0;
             font-family: 'Courier New', monospace;
+        }
+        
+        .sassy-comment {
+            background: linear-gradient(135deg, #FFE6F2 0%, #F0F8FF 100%);
+            border: 2px solid #FF69B4;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            font-style: italic;
+            text-align: center;
+            font-weight: bold;
+            color: #8B008B;
         }
 
         .leaf-count {
@@ -311,14 +346,23 @@
                 <!-- Mood Selector -->
                 <div class="mood-section">
                     <h3>🤖 AI Mood Selector</h3>
-                    <p>Set the AI's mood to affect counting accuracy (5% - 90%)</p>
+                    <p>The AI will randomly choose its mood for each analysis! You can also manually set it below.</p>
+                    
+                    <div class="current-mood-display">
+                        <h4>Current AI Mood: <span id="currentMoodDisplay">😐 Neutral</span></h4>
+                        <p id="moodDescription">The AI is feeling neutral about leaf counting today.</p>
+                    </div>
                     
                     <div class="mood-buttons">
                         <button class="mood-btn" data-mood="excellent">😊 Excellent (85-95%)</button>
                         <button class="mood-btn" data-mood="good">🙂 Good (70-85%)</button>
-                        <button class="mood-btn active" data-mood="neutral">😐 Neutral (50-70%)</button>
+                        <button class="mood-btn" data-mood="neutral">😐 Neutral (50-70%)</button>
                         <button class="mood-btn" data-mood="bad">😕 Bad (25-50%)</button>
                         <button class="mood-btn" data-mood="terrible">😫 Terrible (5-25%)</button>
+                    </div>
+                    
+                    <div class="mood-info">
+                        <p><strong>💡 Tip:</strong> The AI's mood affects its accuracy and sassiness level!</p>
                     </div>
                 </div>
 
@@ -354,6 +398,7 @@
     <script>
         let currentMood = 'neutral';
         let currentFile = null;
+        let moodHistory = [];
 
         // Update time
         function updateTime() {
@@ -384,12 +429,24 @@
             reader.readAsDataURL(file);
         }
 
+        // Mood descriptions
+        const moodDescriptions = {
+            'excellent': 'The AI is absolutely THRILLED and ready to count leaves with maximum sass! 💅✨',
+            'good': 'The AI is in a pretty good mood and feeling generous with its counting! 😊',
+            'neutral': 'The AI is feeling neutral about leaf counting today. 😐',
+            'bad': 'The AI is grumpy and not very enthusiastic about this tree. 😕',
+            'terrible': 'The AI is having a TERRIBLE day and barely trying! 😫💢'
+        };
+        
         // Mood button handling
         document.querySelectorAll('.mood-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 currentMood = this.dataset.mood;
+                
+                // Update mood display
+                updateMoodDisplay(currentMood);
                 
                 // Send mood to server
                 fetch('/api/mood', {
@@ -400,9 +457,24 @@
                     body: JSON.stringify({ mood: currentMood })
                 });
                 
-                showMessage('success', `AI mood set to ${currentMood}!`);
+                showMessage('success', `AI mood manually set to ${currentMood}!`);
             });
         });
+        
+        // Update mood display
+        function updateMoodDisplay(mood) {
+            const moodEmoji = {
+                'excellent': '😊',
+                'good': '🙂',
+                'neutral': '😐',
+                'bad': '😕',
+                'terrible': '😫'
+            };
+            
+            document.getElementById('currentMoodDisplay').textContent = 
+                `${moodEmoji[mood]} ${mood.charAt(0).toUpperCase() + mood.slice(1)}`;
+            document.getElementById('moodDescription').textContent = moodDescriptions[mood];
+        }
 
         // Analyze button handling
         document.getElementById('analyzeBtn').addEventListener('click', function() {
@@ -424,6 +496,12 @@
             document.getElementById('results').style.display = 'none';
             document.getElementById('errorMessage').style.display = 'none';
             document.getElementById('successMessage').style.display = 'none';
+            
+            // Show mood change animation
+            const moodDisplay = document.getElementById('currentMoodDisplay');
+            const originalText = moodDisplay.textContent;
+            moodDisplay.textContent = '🤔 Thinking...';
+            moodDisplay.style.color = '#FF6B6B';
             
             // Simulate progress
             const progressFill = document.querySelector('.progress-fill');
@@ -448,6 +526,9 @@
                     
                     if (data.error) {
                         showMessage('error', data.error);
+                        // Reset mood display
+                        moodDisplay.textContent = originalText;
+                        moodDisplay.style.color = '';
                     } else {
                         showResults(data);
                     }
@@ -473,10 +554,27 @@
                 'terrible': '😫'
             };
             
+            // Update mood display with the AI's actual mood
+            updateMoodDisplay(data.mood);
+            
+            // Add to mood history
+            moodHistory.push({
+                mood: data.mood,
+                timestamp: new Date().toLocaleTimeString(),
+                leafCount: data.leaf_count
+            });
+            
+            // Keep only last 5 entries
+            if (moodHistory.length > 5) {
+                moodHistory.shift();
+            }
+            
             contentDiv.innerHTML = `
                 <div class="result-item">
                     <h4>🍃 Leaf Count Results</h4>
                     <div class="leaf-count">${data.leaf_count} leaves</div>
+                    
+                    ${data.sassy_comment ? `<div class="sassy-comment">"${data.sassy_comment}"</div>` : ''}
                     
                     <div class="result-item">
                         <strong>AI Mood:</strong> ${moodEmoji[data.mood]} ${data.mood.charAt(0).toUpperCase() + data.mood.slice(1)}
@@ -500,6 +598,17 @@
                     <div class="result-item">
                         <strong>Upload Time:</strong> ${data.upload_time}
                     </div>
+                    
+                    ${moodHistory.length > 1 ? `
+                    <div class="result-item">
+                        <strong>AI Mood History:</strong>
+                        <div style="margin-top: 10px; font-size: 0.9em;">
+                            ${moodHistory.slice(-3).map(entry => 
+                                `${entry.timestamp}: ${moodEmoji[entry.mood]} ${entry.mood} (${entry.leafCount} leaves)`
+                            ).join('<br>')}
+                        </div>
+                    </div>
+                    ` : ''}
                 </div>
             `;
             

@@ -5,11 +5,14 @@ A whimsical AI/ML application that counts leaves from tree images with variable 
 ## 🌟 Features
 
 - **AI-Powered Leaf Counting**: Uses computer vision techniques to detect and count leaves in tree images
+- **Random Mood System**: AI randomly chooses its mood for each analysis with weighted probabilities
+- **Sassy Comments**: The AI provides entertaining, mood-based commentary on your tree images
 - **Mood-Based Accuracy**: AI accuracy varies from 5% to 90% based on its current mood
 - **Retro UI Design**: Inspired by classic operating systems with modern sage green accents
 - **Real-time Processing**: Live progress indicators and status updates
 - **Drag & Drop Support**: Easy image upload with drag and drop functionality
 - **Responsive Design**: Works on desktop and mobile devices
+- **Mood History**: Track the AI's mood changes across multiple analyses
 
 ## 🎭 AI Moods & Accuracy
 
@@ -66,9 +69,10 @@ useless3/
 ## 🎮 How to Use
 
 1. **Upload an Image**: Click "📂 Choose Image File" or drag and drop a tree image
-2. **Set AI Mood**: Choose the AI's mood using the mood selector buttons
+2. **Watch AI Mood**: The AI will randomly choose its mood for each analysis (or manually set it)
 3. **Analyze**: Click "🔍 Analyze Leaves" to start the counting process
-4. **View Results**: See the leaf count, confidence level, and processing details
+4. **Enjoy the Sass**: Read the AI's entertaining commentary and mood-based responses
+5. **View Results**: See the leaf count, confidence level, and mood history
 
 ## 🔧 Technical Details
 
@@ -89,6 +93,8 @@ useless3/
 - **Color Segmentation**: HSV color space for green leaf detection
 - **Contour Analysis**: Shape-based leaf identification
 - **Accuracy Simulation**: Mood-based accuracy variation system
+- **Personality System**: Dynamic mood selection with weighted probabilities
+- **Sassy Commentary**: Mood-based response generation system
 
 ## 🎨 UI Design Features
 
