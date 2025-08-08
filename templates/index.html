@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaf Counter AI - Retro Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #87CEEB 0%, #98FB98 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #2F4F2F;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Main Window */
+        .main-window {
+            background: #F5F5DC;
+            border: 3px solid #556B2F;
+            border-radius: 8px;
+            box-shadow: 
+                0 4px 8px rgba(0,0,0,0.3),
+                inset 0 1px 0 rgba(255,255,255,0.4);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .title-bar {
+            background: linear-gradient(90deg, #556B2F 0%, #6B8E23 100%);
+            color: white;
+            padding: 8px 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #2F4F2F;
+        }
+
+        .close-btn {
+            background: #DC143C;
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .window-content {
+            padding: 20px;
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: #F0F8F0;
+            border: 2px solid #90EE90;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            margin: 20px 0;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-btn {
+            background: linear-gradient(90deg, #90EE90 0%, #98FB98 100%);
+            border: 2px solid #556B2F;
+            border-radius: 6px;
+            padding: 12px 24px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #2F4F2F;
+            cursor: pointer;
+            display: inline-block;
+            box-shadow: 
+                0 2px 4px rgba(0,0,0,0.2),
+                inset 0 1px 0 rgba(255,255,255,0.4);
+        }
+
+        .file-input-btn:hover {
+            background: linear-gradient(90deg, #98FB98 0%, #90EE90 100%);
+        }
+
+        /* Mood Selector */
+        .mood-section {
+            background: #F0F8F0;
+            border: 2px solid #90EE90;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .mood-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .mood-btn {
+            background: linear-gradient(90deg, #DDA0DD 0%, #E6E6FA 100%);
+            border: 2px solid #9370DB;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #4B0082;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mood-btn:hover {
+            background: linear-gradient(90deg, #E6E6FA 0%, #DDA0DD 100%);
+            transform: translateY(-2px);
+        }
+
+        .mood-btn.active {
+            background: linear-gradient(90deg, #556B2F 0%, #6B8E23 100%);
+            color: white;
+            border-color: #2F4F2F;
+        }
+
+        /* Results Section */
+        .results-section {
+            background: #F0F8F0;
+            border: 2px solid #90EE90;
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .result-item {
+            background: white;
+            border: 1px solid #90EE90;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .leaf-count {
+            font-size: 2em;
+            font-weight: bold;
+            color: #556B2F;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .confidence-bar {
+            background: #E0E0E0;
+            border: 1px solid #A0A0A0;
+            border-radius: 3px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FF6B6B 0%, #4ECDC4 50%, #45B7D1 100%);
+            transition: width 0.5s ease;
+        }
+
+        /* Image Preview */
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border: 2px solid #90EE90;
+            border-radius: 6px;
+            margin: 15px 0;
+            display: none;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #E0E0E0;
+            border-top: 4px solid #556B2F;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #E0E0E0;
+            border-top: 1px solid #A0A0A0;
+            padding: 5px 15px;
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            background: #E0E0E0;
+            border: 1px solid #A0A0A0;
+            border-radius: 3px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #90EE90 0%, #98FB98 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Error Messages */
+        .error-message {
+            background: #FFE6E6;
+            border: 2px solid #FF6B6B;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            color: #D32F2F;
+            display: none;
+        }
+
+        /* Success Messages */
+        .success-message {
+            background: #E8F5E8;
+            border: 2px solid #90EE90;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+            color: #2E7D32;
+            display: none;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .mood-buttons {
+                flex-direction: column;
+            }
+            
+            .mood-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Application Window -->
+        <div class="main-window">
+            <div class="title-bar">
+                <span>🍃 Leaf Counter AI v1.0 - Retro Edition</span>
+                <button class="close-btn">×</button>
+            </div>
+            
+            <div class="window-content">
+                <!-- Upload Section -->
+                <div class="upload-section">
+                    <h2>📁 Upload Tree Image</h2>
+                    <p>Select an image of a tree to count its leaves</p>
+                    
+                    <div class="file-input-wrapper">
+                        <input type="file" id="imageInput" class="file-input" accept="image/*">
+                        <label for="imageInput" class="file-input-btn">📂 Choose Image File</label>
+                    </div>
+                    
+                    <div id="imagePreview"></div>
+                    
+                    <button id="analyzeBtn" class="file-input-btn" style="display: none;">🔍 Analyze Leaves</button>
+                </div>
+
+                <!-- Mood Selector -->
+                <div class="mood-section">
+                    <h3>🤖 AI Mood Selector</h3>
+                    <p>Set the AI's mood to affect counting accuracy (5% - 90%)</p>
+                    
+                    <div class="mood-buttons">
+                        <button class="mood-btn" data-mood="excellent">😊 Excellent (85-95%)</button>
+                        <button class="mood-btn" data-mood="good">🙂 Good (70-85%)</button>
+                        <button class="mood-btn active" data-mood="neutral">😐 Neutral (50-70%)</button>
+                        <button class="mood-btn" data-mood="bad">😕 Bad (25-50%)</button>
+                        <button class="mood-btn" data-mood="terrible">😫 Terrible (5-25%)</button>
+                    </div>
+                </div>
+
+                <!-- Loading Section -->
+                <div id="loading" class="loading">
+                    <div class="loading-spinner"></div>
+                    <p>🤖 AI is analyzing your tree image...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="results" class="results-section">
+                    <h3>📊 Analysis Results</h3>
+                    <div id="resultsContent"></div>
+                </div>
+
+                <!-- Error Messages -->
+                <div id="errorMessage" class="error-message"></div>
+                
+                <!-- Success Messages -->
+                <div id="successMessage" class="success-message"></div>
+            </div>
+            
+            <div class="status-bar">
+                <span id="statusText">Ready to analyze tree images</span>
+                <span id="currentTime"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMood = 'neutral';
+        let currentFile = null;
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('currentTime').textContent = now.toLocaleTimeString();
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+
+        // File input handling
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                currentFile = file;
+                showImagePreview(file);
+                document.getElementById('analyzeBtn').style.display = 'inline-block';
+                showMessage('success', 'Image selected successfully!');
+            }
+        });
+
+        // Image preview
+        function showImagePreview(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const preview = document.getElementById('imagePreview');
+                preview.innerHTML = `<img src="${e.target.result}" class="image-preview" style="display: block;">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Mood button handling
+        document.querySelectorAll('.mood-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentMood = this.dataset.mood;
+                
+                // Send mood to server
+                fetch('/api/mood', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ mood: currentMood })
+                });
+                
+                showMessage('success', `AI mood set to ${currentMood}!`);
+            });
+        });
+
+        // Analyze button handling
+        document.getElementById('analyzeBtn').addEventListener('click', function() {
+            if (!currentFile) {
+                showMessage('error', 'Please select an image first!');
+                return;
+            }
+            
+            analyzeImage();
+        });
+
+        // Image analysis
+        function analyzeImage() {
+            const formData = new FormData();
+            formData.append('file', currentFile);
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('errorMessage').style.display = 'none';
+            document.getElementById('successMessage').style.display = 'none';
+            
+            // Simulate progress
+            const progressFill = document.querySelector('.progress-fill');
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress > 90) progress = 90;
+                progressFill.style.width = progress + '%';
+            }, 200);
+            
+            fetch('/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                
+                setTimeout(() => {
+                    document.getElementById('loading').style.display = 'none';
+                    
+                    if (data.error) {
+                        showMessage('error', data.error);
+                    } else {
+                        showResults(data);
+                    }
+                }, 500);
+            })
+            .catch(error => {
+                clearInterval(progressInterval);
+                document.getElementById('loading').style.display = 'none';
+                showMessage('error', 'Error analyzing image: ' + error.message);
+            });
+        }
+
+        // Show results
+        function showResults(data) {
+            const resultsDiv = document.getElementById('results');
+            const contentDiv = document.getElementById('resultsContent');
+            
+            const moodEmoji = {
+                'excellent': '😊',
+                'good': '🙂',
+                'neutral': '😐',
+                'bad': '😕',
+                'terrible': '😫'
+            };
+            
+            contentDiv.innerHTML = `
+                <div class="result-item">
+                    <h4>🍃 Leaf Count Results</h4>
+                    <div class="leaf-count">${data.leaf_count} leaves</div>
+                    
+                    <div class="result-item">
+                        <strong>AI Mood:</strong> ${moodEmoji[data.mood]} ${data.mood.charAt(0).toUpperCase() + data.mood.slice(1)}
+                    </div>
+                    
+                    <div class="result-item">
+                        <strong>Confidence:</strong> ${data.confidence}%
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: ${data.confidence}%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <strong>Processing Time:</strong> ${data.processing_time}s
+                    </div>
+                    
+                    <div class="result-item">
+                        <strong>Image Size:</strong> ${data.image_size}
+                    </div>
+                    
+                    <div class="result-item">
+                        <strong>Upload Time:</strong> ${data.upload_time}
+                    </div>
+                </div>
+            `;
+            
+            resultsDiv.style.display = 'block';
+            showMessage('success', 'Analysis completed successfully!');
+        }
+
+        // Show messages
+        function showMessage(type, message) {
+            const errorDiv = document.getElementById('errorMessage');
+            const successDiv = document.getElementById('successMessage');
+            
+            if (type === 'error') {
+                errorDiv.textContent = message;
+                errorDiv.style.display = 'block';
+                successDiv.style.display = 'none';
+            } else {
+                successDiv.textContent = message;
+                successDiv.style.display = 'block';
+                errorDiv.style.display = 'none';
+            }
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+                successDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        // Close button (just for show)
+        document.querySelector('.close-btn').addEventListener('click', function() {
+            if (confirm('Are you sure you want to close the application?')) {
+                window.close();
+            }
+        });
+
+        // Drag and drop support
+        document.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+
+        document.addEventListener('drop', function(e) {
+            e.preventDefault();
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                document.getElementById('imageInput').files = files;
+                const event = new Event('change');
+                document.getElementById('imageInput').dispatchEvent(event);
+            }
+        });
+    </script>
+</body>
+</html>
