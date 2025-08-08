@@ -17,6 +17,69 @@
             min-height: 100vh;
             padding: 20px;
             color: #2F4F2F;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Background Animations */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Floating Leaves */
+        .floating-leaf {
+            position: absolute;
+            font-size: 20px;
+            color: #90EE90;
+            opacity: 0.6;
+            animation: float 8s linear infinite;
+        }
+
+        .floating-leaf:nth-child(1) { left: 10%; animation-delay: 0s; animation-duration: 12s; }
+        .floating-leaf:nth-child(2) { left: 20%; animation-delay: 2s; animation-duration: 10s; }
+        .floating-leaf:nth-child(3) { left: 30%; animation-delay: 4s; animation-duration: 14s; }
+        .floating-leaf:nth-child(4) { left: 40%; animation-delay: 6s; animation-duration: 11s; }
+        .floating-leaf:nth-child(5) { left: 50%; animation-delay: 8s; animation-duration: 13s; }
+        .floating-leaf:nth-child(6) { left: 60%; animation-delay: 10s; animation-duration: 9s; }
+        .floating-leaf:nth-child(7) { left: 70%; animation-delay: 12s; animation-duration: 15s; }
+        .floating-leaf:nth-child(8) { left: 80%; animation-delay: 14s; animation-duration: 12s; }
+        .floating-leaf:nth-child(9) { left: 90%; animation-delay: 16s; animation-duration: 11s; }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Wind Effect */
+        .wind-effect {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+            animation: wind 6s ease-in-out infinite;
+        }
+
+        @keyframes wind {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
         }
 
         .container {
@@ -233,11 +296,12 @@
             display: none;
         }
 
-        /* Loading Animation */
+        /* Enhanced Loading Animation */
         .loading {
             display: none;
             text-align: center;
             padding: 20px;
+            position: relative;
         }
 
         .loading-spinner {
@@ -254,6 +318,140 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* Tree Animation Container */
+        .tree-animation-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            display: none;
+        }
+
+        /* Tree Trunk */
+        .tree-trunk {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 60px;
+            background: linear-gradient(90deg, #8B4513 0%, #A0522D 50%, #8B4513 100%);
+            border-radius: 10px;
+            animation: treeGrow 2s ease-out;
+        }
+
+        /* Tree Leaves */
+        .tree-leaves {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 120px;
+            background: radial-gradient(circle, #90EE90 0%, #32CD32 50%, #228B22 100%);
+            border-radius: 50%;
+            animation: leavesGrow 2s ease-out 0.5s both;
+        }
+
+        /* Falling Leaves Animation */
+        .falling-leaf {
+            position: absolute;
+            font-size: 16px;
+            color: #90EE90;
+            animation: falling 3s linear infinite;
+            opacity: 0;
+        }
+
+        .falling-leaf:nth-child(1) { left: 20%; animation-delay: 0s; }
+        .falling-leaf:nth-child(2) { left: 40%; animation-delay: 0.5s; }
+        .falling-leaf:nth-child(3) { left: 60%; animation-delay: 1s; }
+        .falling-leaf:nth-child(4) { left: 80%; animation-delay: 1.5s; }
+        .falling-leaf:nth-child(5) { left: 30%; animation-delay: 2s; }
+        .falling-leaf:nth-child(6) { left: 70%; animation-delay: 2.5s; }
+
+        @keyframes treeGrow {
+            0% {
+                height: 0;
+                opacity: 0;
+            }
+            100% {
+                height: 60px;
+                opacity: 1;
+            }
+        }
+
+        @keyframes leavesGrow {
+            0% {
+                transform: translateX(-50%) scale(0);
+                opacity: 0;
+            }
+            100% {
+                transform: translateX(-50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes falling {
+            0% {
+                transform: translateY(-50px) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(200px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Scanning Effect */
+        .scanning-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, #90EE90 50%, transparent 100%);
+            animation: scan 2s ease-in-out infinite;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(200px); }
+        }
+
+        /* Pulse Effect */
+        .pulse-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border: 2px solid #90EE90;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+
+
+
 
         /* Status Bar */
         .status-bar {
@@ -319,6 +517,19 @@
     </style>
 </head>
 <body>
+    <!-- Background Animations -->
+    <div class="background-animation">
+        <div class="wind-effect"></div>
+        <div class="floating-leaf">🍃</div>
+        <div class="floating-leaf">🌿</div>
+        <div class="floating-leaf">🍂</div>
+        <div class="floating-leaf">🌱</div>
+        <div class="floating-leaf">🍃</div>
+        <div class="floating-leaf">🌿</div>
+        <div class="floating-leaf">🍂</div>
+        <div class="floating-leaf">🌱</div>
+    </div>
+
     <div class="container">
         <!-- Main Application Window -->
         <div class="main-window">
@@ -366,8 +577,20 @@
                     </div>
                 </div>
 
-                <!-- Loading Section -->
+                <!-- Enhanced Loading Section -->
                 <div id="loading" class="loading">
+                    <div class="tree-animation-container" id="treeAnimation">
+                        <div class="tree-trunk"></div>
+                        <div class="tree-leaves"></div>
+                        <div class="falling-leaf">🍃</div>
+                        <div class="falling-leaf">🌿</div>
+                        <div class="falling-leaf">🍂</div>
+                        <div class="falling-leaf">🌱</div>
+                        <div class="falling-leaf">🍃</div>
+                        <div class="falling-leaf">🌿</div>
+                        <div class="scanning-line"></div>
+                        <div class="pulse-effect"></div>
+                    </div>
                     <div class="loading-spinner"></div>
                     <p>🤖 AI is analyzing your tree image...</p>
                     <div class="progress-bar">
@@ -476,6 +699,37 @@
             document.getElementById('moodDescription').textContent = moodDescriptions[mood];
         }
 
+        // Tree animation function
+        function startTreeAnimation() {
+            const treeAnimation = document.getElementById('treeAnimation');
+            const treeTrunk = treeAnimation.querySelector('.tree-trunk');
+            const treeLeaves = treeAnimation.querySelector('.tree-leaves');
+            
+            // Reset animations
+            treeTrunk.style.animation = 'none';
+            treeLeaves.style.animation = 'none';
+            
+            // Trigger reflow
+            treeTrunk.offsetHeight;
+            treeLeaves.offsetHeight;
+            
+            // Start animations
+            treeTrunk.style.animation = 'treeGrow 2s ease-out';
+            treeLeaves.style.animation = 'leavesGrow 2s ease-out 0.5s both';
+            
+            // Add falling leaves effect
+            const fallingLeaves = treeAnimation.querySelectorAll('.falling-leaf');
+            fallingLeaves.forEach((leaf, index) => {
+                leaf.style.animation = `falling 3s linear infinite ${index * 0.5}s`;
+            });
+        }
+
+        // Stop tree animation
+        function stopTreeAnimation() {
+            const treeAnimation = document.getElementById('treeAnimation');
+            treeAnimation.style.display = 'none';
+        }
+
         // Analyze button handling
         document.getElementById('analyzeBtn').addEventListener('click', function() {
             if (!currentFile) {
@@ -491,8 +745,11 @@
             const formData = new FormData();
             formData.append('file', currentFile);
             
-            // Show loading
-            document.getElementById('loading').style.display = 'block';
+            // Show loading with tree animation
+            const loadingDiv = document.getElementById('loading');
+            const treeAnimation = document.getElementById('treeAnimation');
+            loadingDiv.style.display = 'block';
+            treeAnimation.style.display = 'block';
             document.getElementById('results').style.display = 'none';
             document.getElementById('errorMessage').style.display = 'none';
             document.getElementById('successMessage').style.display = 'none';
@@ -502,6 +759,9 @@
             const originalText = moodDisplay.textContent;
             moodDisplay.textContent = '🤔 Thinking...';
             moodDisplay.style.color = '#FF6B6B';
+            
+            // Start tree animation
+            startTreeAnimation();
             
             // Simulate progress
             const progressFill = document.querySelector('.progress-fill');
@@ -523,6 +783,7 @@
                 
                 setTimeout(() => {
                     document.getElementById('loading').style.display = 'none';
+                    stopTreeAnimation();
                     
                     if (data.error) {
                         showMessage('error', data.error);
@@ -537,6 +798,7 @@
             .catch(error => {
                 clearInterval(progressInterval);
                 document.getElementById('loading').style.display = 'none';
+                stopTreeAnimation();
                 showMessage('error', 'Error analyzing image: ' + error.message);
             });
         }
