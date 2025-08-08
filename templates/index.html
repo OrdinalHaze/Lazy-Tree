@@ -263,6 +263,16 @@
             color: #8B008B;
         }
 
+        .angry-warning {
+            background: #FFF1F1;
+            border: 2px solid #E53935;
+            color: #B71C1C;
+            border-radius: 6px;
+            padding: 12px 14px;
+            margin: 12px 0;
+            font-weight: bold;
+        }
+
         .leaf-count {
             font-size: 2em;
             font-weight: bold;
@@ -836,6 +846,8 @@
                     <h4>🍃 Leaf Count Results</h4>
                     <div class="leaf-count">${data.leaf_count} leaves</div>
                     
+                    ${data.is_tree === false ? `<div class="angry-warning">🚫 The AI declares: "That is NOT a tree." It is now very, very angry. 💢</div>` : ''}
+                    
                     ${data.sassy_comment ? `<div class="sassy-comment">"${data.sassy_comment}"</div>` : ''}
                     
                     <div class="result-item">
@@ -860,6 +872,15 @@
                     <div class="result-item">
                         <strong>Upload Time:</strong> ${data.upload_time}
                     </div>
+                    
+                    ${data.tree_check ? `
+                    <div class="result-item">
+                        <strong>Tree Check:</strong> ${data.tree_check.reason}
+                        <div style="margin-top:6px;">
+                            Green ratio: ${data.tree_check.green_ratio}, Brown ratio: ${data.tree_check.brown_ratio}, Score: ${data.tree_check.score}
+                        </div>
+                    </div>
+                    ` : ''}
                     
                     ${moodHistory.length > 1 ? `
                     <div class="result-item">

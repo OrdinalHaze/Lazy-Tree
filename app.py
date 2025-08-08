@@ -85,6 +85,15 @@ class LeafCounterAI:
                 "I'm having a breakdown and you want me to count LEAVES?! ARE YOU KIDDING ME?! 😭💔"
             ]
         }
+
+        # Extra spicy comments when the image is not a tree at all
+        self.non_tree_comments = [
+            "EXCUSE ME?! This isn't even a tree. What am I supposed to count, your hopes and dreams? 😤🌪️",
+            "That is NOT a tree. My leaves just fell off out of rage. 😡🍂",
+            "Do I look like a 'count anything' bot? Bring me a TREE, not... whatever THAT was. 😾",
+            "If that's a tree, then I'm a toaster. Please. Try again. 😠",
+            "Absolutely not. Zero trees detected. Maximum attitude activated. 💢"
+        ]
     
     def set_mood(self, mood):
         """Set the AI's mood which affects accuracy"""
@@ -101,6 +110,52 @@ class LeafCounterAI:
         comments = self.mood_comments.get(self.mood, ["I'm counting leaves."])
         return random.choice(comments)
     
+    def detect_tree(self, hsv: np.ndarray, total_pixels: int) -> tuple[bool, str, dict]:
+        """Very lightweight heuristic to decide if the image likely contains a tree.
+        - Checks proportion of green pixels (canopy)
+        - Checks proportion of brown-ish pixels (possible trunk/branches)
+        Returns: (is_tree, reason, scores)
+        """
+        # Green mask (canopy)
+        lower_green = np.array([35, 50, 50])
+        upper_green = np.array([85, 255, 255])
+        green_mask = cv2.inRange(hsv, lower_green, upper_green)
+        green_ratio = float(np.count_nonzero(green_mask)) / float(total_pixels)
+
+        # Brown mask (trunk) in HSV – approximate
+        # Hue 10-25, moderate to high saturation, medium value
+        lower_brown = np.array([10, 60, 40])
+        upper_brown = np.array([25, 255, 200])
+        brown_mask = cv2.inRange(hsv, lower_brown, upper_brown)
+        brown_ratio = float(np.count_nonzero(brown_mask)) / float(total_pixels)
+
+        # Combined score favors canopy but gives some weight to trunk
+        score = 0.8 * green_ratio + 0.2 * brown_ratio
+
+        # Heuristics
+        # Clearly not a tree if almost no green and almost no brown
+        if green_ratio < 0.02 and brown_ratio < 0.005:
+            return (False, "Very little green or brown detected", {
+                "green_ratio": round(green_ratio, 4),
+                "brown_ratio": round(brown_ratio, 4),
+                "score": round(score, 4)
+            })
+
+        # Likely a tree if overall score passes threshold
+        if score >= 0.03:
+            return (True, "Green/brown ratios consistent with foliage and trunk", {
+                "green_ratio": round(green_ratio, 4),
+                "brown_ratio": round(brown_ratio, 4),
+                "score": round(score, 4)
+            })
+
+        # Otherwise uncertain → treat as not a tree for the personality effect
+        return (False, "Insufficient canopy/trunk signals", {
+            "green_ratio": round(green_ratio, 4),
+            "brown_ratio": round(brown_ratio, 4),
+            "score": round(score, 4)
+        })
+    
     def count_leaves(self, image_path):
         """Count leaves in an image with variable accuracy based on mood"""
         try:
@@ -116,6 +171,9 @@ class LeafCounterAI:
             # Get image dimensions
             height, width = gray.shape
             total_pixels = height * width
+
+            # First, decide if this even looks like a tree
+            is_tree, reason, scores = self.detect_tree(hsv, total_pixels)
             
             # Simulate leaf detection with computer vision techniques
             # This is a simplified approach - in a real application, you'd use more sophisticated ML models
@@ -139,8 +197,15 @@ class LeafCounterAI:
             # Base leaf count from contours
             base_leaf_count = len(leaf_contours)
             
-            # Apply mood-based accuracy variation
-            accuracy_range = self.mood_accuracy_map[self.mood]
+            # If not a tree, flip to maximum anger and lower confidence
+            if not is_tree:
+                self.mood = "terrible"
+                # Reduce the base count impact and confidence when angry
+                base_leaf_count = 0
+                accuracy_range = (5, 20)
+            else:
+                # Apply mood-based accuracy variation
+                accuracy_range = self.mood_accuracy_map[self.mood]
             accuracy_factor = random.uniform(accuracy_range[0], accuracy_range[1]) / 100
             
             # Add some randomness to make it more realistic
@@ -155,6 +220,9 @@ class LeafCounterAI:
             # Generate confidence score based on mood
             confidence = random.uniform(accuracy_range[0], accuracy_range[1])
             
+            # Pick sassy comment; if not a tree, pick from angry pool
+            comment = random.choice(self.non_tree_comments) if not is_tree else self.get_sassy_comment()
+
             return {
                 "leaf_count": final_leaf_count,
                 "confidence": round(confidence, 1),
@@ -162,7 +230,9 @@ class LeafCounterAI:
                 "base_count": base_leaf_count,
                 "image_size": f"{width}x{height}",
                 "processing_time": round(random.uniform(0.5, 3.0), 2),
-                "sassy_comment": self.get_sassy_comment()
+                "sassy_comment": comment,
+                "is_tree": is_tree,
+                "tree_check": {"reason": reason, **scores}
             }
             
         except Exception as e:
