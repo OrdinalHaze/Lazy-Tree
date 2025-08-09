@@ -44,10 +44,10 @@ python app.py
 For Software:
 
 # Screenshots (Add at least 3)
-<img width="3188" height="1202" alt="frame (3)" src="" />
-*Add caption explaining what this shows*
+<img width="3188" height="1202" alt="frame (3)" src="Screenshot 2025-08-09 071153.png" />
+*Uploading section*
 
-![Screenshot2](Add screenshot 2 here with proper name)
+<img width="3188" height="1202" alt="frame (3)" src="" />
 *Add caption explaining what this shows*
 
 ![Screenshot3](Add screenshot 3 here with proper name)
