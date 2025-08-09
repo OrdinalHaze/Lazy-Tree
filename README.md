@@ -5,7 +5,7 @@
 
 
 ## Basic Details
-### Team name: Sebin GEo
+### Team name: Sebin Geo
 
 
 ### Team Members
