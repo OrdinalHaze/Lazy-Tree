@@ -50,8 +50,8 @@ For Software:
 <img width="3188" height="1202" alt="frame (3)" src="Screenshot 2025-08-09 071217.png" />
 *File is uploaded*
 
-<img width="3188" height="1202" alt="frame (3)" src="" />
-*Add caption explaining what this shows*
+<img width="3188" height="1202" alt="frame (3)" src="Screenshot 2025-08-09 071253.png" />
+*Final results based on mood*
 
 
 
@@ -59,11 +59,10 @@ For Software:
 
 ### Project Demo
 # Video
-[Add your demo video link here]
-*Explain what the video demonstrates*
+[video}(https://drive.google.com/file/d/1ML0tWpySb3TsbHRaaxvNO1HQasn6y96P/view?usp=drive_link)
+**
 
-# Additional Demos
-[Add any extra demo materials/links]
+
 
 ## Team Contributions
 - Sebin Geo: Made the app
